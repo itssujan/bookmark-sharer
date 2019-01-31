@@ -1,0 +1,21 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./tmp/data:/var/lib/postgresql/data
+  redis:
+    image: redis
+    command: redis-server
+    volumes:
+      - ./tmp/data:/var/lib/redis/data
+  web:
+    build: .
+    command: bundle exec puma -p 3000
+    volumes:
+      - .:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
