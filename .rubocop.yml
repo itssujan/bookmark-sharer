@@ -1,0 +1,13 @@
+AllCops:
+  Excludes:
+    - Gemfile
+    - bin/**
+    - db/**
+    - config/**
+    - script/**
+Documentation:
+    Enabled: false
+Metrics/LineLength:
+  Max: 100
+Metrics/BlockLength:
+  Enabled: false
