@@ -18,53 +18,36 @@ RSpec.describe 'Users API', type: :request do
   end
 
   describe 'CREATE /users' do
-    context 'when all parameters are passed' do
-      before { User.destroy_all }
-      user_params = { first_name: 'john', last_name: 'doe', email: 'johndoe@johndoe.com' }
+    before { User.destroy_all }
+    user_params = { first_name: 'john', last_name: 'doe', email: 'johndoe@johndoe.com' }
 
-      it 'returns creates user when params are passed' do
-        expect { post '/users', params: user_params }.to change { User.count }.from(0).to(1)
-      end
-
-      it 'returns 201 status code' do
-        post '/users', params: user_params
-        expect(response).to have_http_status(201)
-      end
+    it 'creates user with valid user params' do
+      expect { post '/users', params: user_params }.to change { User.count }.from(0).to(1)
     end
 
-    context 'when first_name is not passed' do
-      before(:each) do
-        user_params = { last_name: 'doe', email: 'johndoe@johndoe.com' }
-        post '/users', params: user_params
-      end
-
-      it 'throws a missing first_name exception' do
-        expect(json['message']).to eq("Validation failed: First name can't be blank")
-      end
+    it 'returns 201 status code' do
+      post '/users', params: user_params
+      expect(response).to have_http_status(201)
     end
 
-    context 'when email is not passed' do
-      before(:each) do
-        user_params = { first_name: 'john', last_name: 'doe' }
-        post '/users', params: user_params
-      end
-
-      it 'throws a missing first_name exception' do
-        expect(json['message']).to eq("Validation failed: Email can't be blank, Email is invalid")
-      end
+    it 'throws a missing first_name exception' do
+      user_params = {last_name: 'doe', email: 'johndoe@johndoe.com' }
+      post '/users', params: user_params
+      expect(json['message']).to eq("Validation failed: First name can't be blank")
     end
 
-    context 'when email is not unique' do
-      before(:each) do
+    it 'throws a missing first_name exception' do
+      user_params = { first_name: 'john', last_name: 'doe'}
+      post '/users', params: user_params
+      expect(json['message']).to eq("Validation failed: Email can't be blank, Email is invalid")
+    end
+
+    it 'should have unique email' do
+      2.times do
         user_params = { first_name: 'john', last_name: 'doe', email: 'johndoe@johndoe.com' }
         post '/users', params: user_params
       end
-
-      it 'throws a missing first_name exception' do
-        user_params = { first_name: 'john', last_name: 'doe', email: 'johndoe@johndoe.com' }
-        post '/users', params: user_params
-        expect(json['message']).to eq('Validation failed: Email has already been taken')
-      end
+      expect(json['message']).to eq('Validation failed: Email has already been taken')
     end
   end
 
